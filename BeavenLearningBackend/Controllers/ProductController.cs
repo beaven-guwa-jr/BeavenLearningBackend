@@ -9,13 +9,13 @@ namespace BeavenLearningBackend.Controllers
     [Route("api/[controller]")]
     public class ProductController(IProductService service) : ControllerBase
     {
-        List<Product> products = new List<Product>();
+        
 
 
         [HttpGet("{id}")]
         public async Task<IActionResult>GetProduct([FromRoute]int id)
         {
-            var result = service.FindProduct(id);
+            var result = await service.FindProduct(id);
             if (result == null) {
                 return NotFound();
             }
@@ -25,7 +25,7 @@ namespace BeavenLearningBackend.Controllers
         [HttpGet()]
         public async Task<IActionResult> GetProductList()
         {
-            var result = service.ListProducts();
+            var result = await service.ListProducts();
             return Ok(new { result });
         }
 
@@ -39,7 +39,7 @@ namespace BeavenLearningBackend.Controllers
             {
                 return BadRequest(ModelState);  
             }
-            var result = service.AddProduct(product);
+            var result = await service.AddProduct(product);
             return Ok(result);
         }
 
@@ -50,7 +50,7 @@ namespace BeavenLearningBackend.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var result = service.UpdateProduct(product);
+            var result = await service.UpdateProduct(product);
             if (result == null) {
                 return NotFound();
             }

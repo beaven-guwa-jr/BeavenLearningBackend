@@ -1,20 +1,16 @@
-﻿using BeavenLearningBackend.Data;
+﻿using AutoMapper;
+using BeavenLearningBackend.Data;
 using BeavenLearningBackend.Models;
 
 namespace BeavenLearningBackend.Services
 {
-    public class ProductService(ApplicationDbContext context) : IProductService
+    public class ProductService(ApplicationDbContext context, IMapper mapper) : IProductService
     {
-
-        
 
         public async Task<int> AddProduct(ProductDTO product)
         {
-            var newProduct = new Product()
-            {
-                Name = product.Name,
-                Price = product.Price,
-            };
+            var newProduct = mapper.Map<Product>(product);
+
 
             context.Products.Add(newProduct);
 
@@ -25,25 +21,29 @@ namespace BeavenLearningBackend.Services
         public async Task DeleteProduct(int productId)
         {
             var product = context.Products.FirstOrDefault(p => p.Id == productId);
-            if (product != null) 
+            if (product != null)
             {
                 product.IsDeleted = true;
-                await context.SaveChangesAsync();   
+                await context.SaveChangesAsync();
             }
         }
 
-        public async Task<Product?> FindProduct(int productId)
+        public async Task<ProductDTO?> FindProduct(int productId)
         {
-           return context.Products.FirstOrDefault(x => x.Id == productId);
-          
+            var product = context.Products.FirstOrDefault(x => x.Id == productId);
+            var result = mapper.Map<ProductDTO>(product);
+            return result;
+
         }
 
-        public async Task<List<Product>> ListProducts()
+        public async Task<List<ProductDTO>> ListProducts()
         {
-            return context.Products.ToList();
+            var products = context.Products.ToList();
+            var result = mapper.Map<List<ProductDTO>>(products);
+            return result;
         }
 
-        public async  Task<Product?> UpdateProduct(ProductDTO product)
+        public async Task<ProductDTO?> UpdateProduct(ProductDTO product)
         {
             var currentProduct = context.Products.FirstOrDefault(x => x.Name == product.Name);
             if (currentProduct == null)
@@ -55,7 +55,9 @@ namespace BeavenLearningBackend.Services
 
             context.Update(currentProduct);
             await context.SaveChangesAsync();
-            return currentProduct;
+
+            var updatedProduct = await FindProduct(currentProduct.Id);
+            return updatedProduct;
         }
     }
 }
