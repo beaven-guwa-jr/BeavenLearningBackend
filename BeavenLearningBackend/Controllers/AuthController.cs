@@ -33,3 +33,4 @@ public class AuthController(IAuthService service) : ControllerBase
 }
 
 // Assignment: try to set up login from the controller - comms with service, getting data and back!
+// Run Migrations to update db tables as a task.
